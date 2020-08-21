@@ -2,8 +2,10 @@ package com.qingcheng.controller;
 
 import com.qingcheng.entity.Result;
 import com.qingcheng.service.service.SeckillOderService;
+import com.qingcheng.util.SeckillStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sun.plugin.liveconnect.SecurityContextHelper;
@@ -14,6 +16,16 @@ public class SeckillOrderController {
 
     @Autowired
     private SeckillOderService seckillOderService;
+
+    @GetMapping(value = "/queryStatus")
+    public Result queryStatus(){
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(name.equals("annomous")){
+            return new Result(430,"用户未登录");
+        }
+        SeckillStatus seckillStatus = seckillOderService.queryStatus(name);
+        return new Result(200,seckillStatus.getStatus().toString());
+    }
 
     /**
      * 用户下单操作

@@ -1,6 +1,17 @@
 package com.qingcheng.service.service;
 
+import com.qingcheng.util.SeckillStatus;
+
 public interface SeckillOderService {
+
+    /**
+     * 修改订单状态
+     * @param username
+     * @return
+     */
+    void updateStatus(String outtradeno,String username,String transactionId);
+
+    SeckillStatus queryStatus(String username);
 
     /**
      *

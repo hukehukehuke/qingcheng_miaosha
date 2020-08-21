@@ -47,9 +47,25 @@ public class SeckillGoodTask {
             List<SeckillGoods> seckillGoodsList = seckillGoodsMapper.selectByExample(example);
             for(SeckillGoods seckillGoods : seckillGoodsList){
                 //3、将秒杀商品存入Redis
+                //完整数据
                 redisTemplate.boundHashOps("SeckillGoods_"+DateUtil.date2Str(startTime)).put(seckillGoods.getId(),seckillGoods);
-            }
-        }
+                //剩余库存个数
+                //创建队列存储商品剩余内存
+                Long[] longs = pushId(seckillGoods.getStockCount(), seckillGoods.getGoodsId());
+                redisTemplate.boundListOps("SeckillGoods_"+seckillGoods.getId()).leftPush(longs);
 
+
+                //创建自增key的值
+                redisTemplate.boundHashOps("SeckillGoodsCount").increment(seckillGoods.getId(),seckillGoods.getStockCount());
+            }
+
+        }
+    }
+    public Long[] pushId(int len,Long id){
+        Long[] ids = new Long[len];
+        for(int i = 0;i <len; i++){
+            ids[i] = id;
+        }
+        return ids;
     }
 }
